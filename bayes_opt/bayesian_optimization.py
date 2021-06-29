@@ -148,6 +148,21 @@ class BayesianOptimization(Observable):
         self._space.register(params, target)
         self.dispatch(Events.OPTIMIZATION_STEP)
 
+    def remove_values(self, params, target=None):
+        ret_d = self._space.remove_values(params, target)
+        self.dispatch(Events.OPTIMIZATION_STEP)
+        return ret_d
+
+    def remove_earlist_N(self, n):
+        ret_d = self._space.remove_earlist_N(n)
+        self.dispatch(Events.OPTIMIZATION_STEP)
+        return ret_d
+
+    def remove_latest_N(self, n):
+        ret_d = self._space.remove_latest_N(n)
+        self.dispatch(Events.OPTIMIZATION_STEP)
+        return ret_d
+
     def probe(self, params, lazy=True):
         """
         Evaluates the function on the given points. Useful to guide the optimizer.

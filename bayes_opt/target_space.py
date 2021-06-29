@@ -165,6 +165,36 @@ class TargetSpace(object):
 
         self._params = np.concatenate([self._params, x.reshape(1, -1)])
         self._target = np.concatenate([self._target, [target]])
+    
+    def remove_values(self, params, target=None):
+        x = self._as_array(params)
+        # for idx, ele in enumerate(self._params):
+        #     if ele == x:
+        #         self._params = np.delete(self._params, idx)
+        #         self._target = np.delete(self._target, idx)
+        #         break
+        self._cache.pop(_hashable(x.ravel()), None)
+        mask = self._params != x
+        self._params = self._params[mask].reshape(-1, 1)
+        self._target = self._target[mask.flatten()]
+
+    def remove_latest_N(self, n):
+        ret_d ={ "params ": self._params[-n:], "target": self._target[-n:]}
+        for k in self._params[-n:]:
+            self._cache.pop(_hashable(k.ravel()), None)
+        mask = [ -x-1 for x in list(range(n))]
+        self._params = np.delete(self._params, mask).reshape(-1,1)
+        self._target = np.delete(self._target, mask)
+        return ret_d
+    
+    def remove_earlist_N(self, n):
+        ret_d ={ "params ": self._params[n:], "target": self._target[n:]}
+        for k in self._params[n:]:
+            self._cache.pop(_hashable(k.ravel()), None)
+        mask = list(range(n))
+        self._params = np.delete(self._params, mask).reshape(-1,1)
+        self._target = np.delete(self._target, mask)
+        return ret_d
 
     def probe(self, params):
         """

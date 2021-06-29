@@ -164,6 +164,29 @@ def load_logs(optimizer, logs):
 
     return optimizer
 
+def load_latest_n_logs(optimizer, logs, n):
+    """Load previous ...
+
+    """
+    import json
+
+    if isinstance(logs, str):
+        logs = [logs]
+
+    for log in logs:
+        with open(log, "r") as j:
+            lines = j.readlines()
+            for line in lines[len(lines)-n:]:
+                iteration = json.loads(line)
+                try:
+                    optimizer.register(
+                        params=iteration["params"],
+                        target=iteration["target"],
+                    )
+                except KeyError:
+                    pass
+
+    return optimizer
 
 def ensure_rng(random_state=None):
     """
